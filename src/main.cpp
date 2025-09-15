@@ -25,6 +25,7 @@ int main() {
     sort_strings    ( text );
     writing_in_file ( text );
 
+    fprintf( stderr, "%s", text[5331] );
     return 0;
 }
 
@@ -59,7 +60,7 @@ void sort_strings( char text[][ 200 ] ) {
         }
 
         cnt++;
-        fprintf( stderr, "sorted %d\n", cnt );
+        // fprintf( stderr, "sorted %d\n", cnt );
     }
 }
 
