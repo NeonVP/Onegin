@@ -19,32 +19,43 @@ void swap( char** str1, char** str2 );
 int main() {
     FILE* file = fopen( "./texts/original_text.txt", "r" );
 
-    assert( file != NULL );
-    fprintf( stderr, "Succesful opening file\n" );
+    if ( file == NULL ) {
+        fprintf( stderr, "Fail - open file\n" );
+        return 1;
+    }
+    else {
+        fprintf( stderr, "Succesful - open file\n" );
+    }
 
     long nLines = lines_counter( file );
 
     char** text = ( char** ) calloc ( ( size_t )nLines, sizeof( char* ) );
 
-    assert( text != NULL);
-    fprintf(stderr, "Succesful inizialized value for text\n" );
+    if ( text == NULL ) {
+        fprintf( stderr, "Fail - allocate memory for the text\n" );
+        return 1;
+    }
+    else {
+        fprintf(stderr, "Succesful - allocate memory for the text\n" );
+    }
 
-    reading_file    ( file, text, nLines );
+    reading_file( file, text, nLines );
+
     fclose( file );
 
     FILE* file_for_results = fopen( "./texts/result_text.txt", "w" );
 
-    assert( file_for_results != NULL );
-    fprintf( stderr, "Succesful opening file\n" );
+    if ( file == NULL ) {
+        fprintf( stderr, "Fail - open file\n" );
+        return 1;
+    }
+    else {
+        fprintf( stderr, "Succesful - open file\n" );
+    }
 
     bubble_sort_strings( text, nLines );
 
     writing_in_file( file_for_results, text, nLines );
-
-    /* FOR DEBUG - write text in OUTPUT*/
-    // for ( int i = 0; i < nLines; i++ ) {
-    //     fprintf( stderr, "%s", text[ i ] );
-    // }
 
     fclose( file_for_results );
     free_text( text, nLines );
@@ -67,14 +78,21 @@ void reading_file( FILE* file, char** text, const long nLines ) {
 }
 
 void writing_in_file( FILE* file_for_results, char** text, const long nLines ) {
+    assert( file_for_results != NULL );
+    assert( text             != NULL );
+    assert( isfinite( nLines )       );
+
     for ( int i = 0; i < nLines; i++ ) {
         fputs( text[i], file_for_results );
     }
+
+    fprintf( stderr, "Succesful - write in file\n" );
 }
 
 void free_text( char** text, const long nLines ) {
     assert( text != NULL       );
     assert( isfinite( nLines ) );
+
     for ( long int i = 0; i < nLines; i++ ) {
         free( text[i] );
     }
@@ -86,21 +104,15 @@ void bubble_sort_strings( char** text, const long nLines ) {
     assert( text != NULL       );
     assert( isfinite( nLines ) );
 
-    fprintf( stderr, "In bubble_sort\n" );
-
     int cnt = 1;
     while ( cnt < nLines ) {
-        fprintf( stderr, "%d\n", cnt );
         for ( int i = 0; i < nLines - cnt; i++ ) {
             int result = my_strcmp( text[ i ], text[ i + 1 ] );
+
             if ( result > 0 ) {
-                // fprintf( stderr, "Before swap\n" );
                 swap( &text[ i ], &text[ i + 1 ] );
-                // fprintf( stderr, "After swap\n" );
             }
         }
-
-        fprintf( stderr, "sorted %d\n", cnt );
 
         cnt++;
     }
@@ -129,5 +141,3 @@ long lines_counter( FILE* file ) {
 
     return cnt;
 }
-
-// int str
