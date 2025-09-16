@@ -92,7 +92,7 @@ void bubble_sort_strings( char** text, const long nLines ) {
     while ( cnt < nLines ) {
         fprintf( stderr, "%d\n", cnt );
         for ( int i = 0; i < nLines - cnt; i++ ) {
-            int result = strcmp( text[ i ], text[ i + 1 ] );
+            int result = my_strcmp( text[ i ], text[ i + 1 ] );
             if ( result > 0 ) {
                 // fprintf( stderr, "Before swap\n" );
                 swap( &text[ i ], &text[ i + 1 ] );

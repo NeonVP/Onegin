@@ -12,25 +12,34 @@ int my_puts ( const char * string ) {
     return 0;
 }
 
-/* being recycled*/
-// int my_strcmp( const char* lhs, const char* rhs ) {
-//     while ( *lhs != '\0' && *rhs != '\0' ) {
-//         if ( *lhs - *rhs == 0 ) {
-//             continue;
-//         }
-//         else if ( *lhs - *rhs > 0 ) {
-//             return 1;
-//         }
-//         else {
-//             return -1;
-//         }
+int my_strcmp( const char* lhs, const char* rhs ) {
+    int diff = 0;
 
-//         lhs++;
-//         rhs++;
-//     }
+    while ( *lhs != '\0' && *rhs != '\0' ) {
+        diff = *lhs++ - *rhs++;
+        if ( diff == 0 ) {
+            continue;
+        }
+        else if ( diff > 0 ) {
+            return 1;
+        }
+        else {
+            return -1;
+        }
+    }
 
-//     return 0;
-// }
+    diff = *lhs++ - *rhs++;
+
+    if ( diff == 0 ) {
+        return 0;
+    }
+    else if ( diff > 0 ) {
+        return 1;
+    }
+    else {
+        return -1;
+    }
+}
 
 
 void my_strswap( char* str1, char* str2 ) {
