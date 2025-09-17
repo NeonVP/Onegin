@@ -6,37 +6,31 @@
 
 #include <sys/stat.h>
 
+#include "../include/common.h"
 #include "../include/String.h"
+#include "../include/sorting.h"
+#include "../include/iostream.h"
 
-struct StrPar{
-    const char* ptr;
-    size_t len = 0;
+struct Files {
+    const char* original_text;
+    const char* result_text;
 };
-
-void writing_in_file( FILE* file_for_results, StrPar* strings, const size_t nLines );
-
-size_t lines_counter( const char* text );
-
-void splitting_into_lines( StrPar* string_ptrs, char* text, const size_t nLines );
-
-void bubble_sort( StrPar* strings, const size_t nLines );
-void swap( StrPar* str1, StrPar* str2 );
-int comparator( const void* param1, const void* param2 );
-
-void go_to_alpha( const char** str );
-int first_comparator( const void* param1, const void* param2 );
 
 
 int main() {
-    const char* file_with_original_text = "./texts/original_text.txt";
+    Files files =
+    {
+        "./texts/original_text.txt",
+        "./texts/result_text.txt"
+    };
+
+    FILE* file = fopen( files.original_text, "r" );
 
     struct stat file_stat;
-    stat( file_with_original_text, &file_stat );
-    size_t size = ( size_t ) file_stat.st_size;
+    stat( files.original_text, &file_stat );
+    off_t size = file_stat.st_size;
 
     char* text = ( char* ) calloc ( size + 1, sizeof( char ) );
-
-    FILE* file = fopen( file_with_original_text, "r" );
 
     assert( file != NULL );
 
@@ -46,8 +40,6 @@ int main() {
 
     size_t nLines = lines_counter( text );
 
-    // nLines = 3;
-
     StrPar* strings = ( StrPar* ) calloc ( nLines, sizeof( StrPar ) );
 
     assert( strings != NULL );
@@ -56,144 +48,20 @@ int main() {
 
     bubble_sort( strings, nLines );
 
-    FILE* file_for_results = fopen( "./texts/result_text.txt", "w" );
+    FILE* file_for_results = fopen( files.result_text, "w" );
 
     assert( file_for_results != NULL );
 
     writing_in_file( file_for_results, strings, nLines );
+
+    // qsort( ( void* ) strings, nLines, sizeof( StrPar ), second_comparator );
+
+    // writing_in_file( file_for_results, strings, nLines );
 
     fclose( file_for_results );
 
     free( text );
     free( strings );
 
-    // fprintf( stderr, "%d\n", strcmp( "aaa", "bbb" ) );
-    // fprintf( stderr, "%d\n", first_comparator( "aaa", "bbb" ) );
-
-    const char* str = "abcde   h";
-    const char* str_old = str;
-
-    go_to_alpha( &str );
-
-    fprintf( stderr, "%ld\n", str_old - str );
-
-
-
     return 0;
-}
-
-
-void writing_in_file( FILE* file_for_results, StrPar* strings, const size_t nLines ) {
-    assert( file_for_results != NULL );
-    assert( strings          != NULL );
-    assert( nLines > 0               );
-
-    for ( size_t i = 0; i < nLines; i++ ) {
-        fputs( strings[i].ptr, file_for_results );
-    }
-
-    fprintf( stderr, "Succesful - write in file\n" );
-}
-
-void splitting_into_lines( StrPar* strings, char* text, const size_t nLines ) {
-    for ( size_t i = 0; i < nLines; i++ ) {
-        strings[i].ptr = text;
-        fprintf( stderr, "  text ptr - %p\n", text);
-        fprintf( stderr, "string ptr - %p\n", strings[i].ptr);
-
-        while ( *text != '\n' ) {
-            strings[i].len++;
-            fprintf( stderr, "len - %d\n", ( int ) strings[i].len);
-            text++;
-        }
-
-        *text++ = '\0';
-    }
-}
-
-void bubble_sort( StrPar* strings, const size_t nLines ) {
-    assert( strings != NULL    );
-    assert( isfinite( nLines ) );
-
-    size_t cnt = 1;
-    while ( cnt < nLines ) {
-        for ( size_t i = 0; i < nLines - cnt; i++ ) {
-            int result = first_comparator( ( const void* )&strings[ i ], ( const void* )&strings[ i + 1 ] );
-            // int result = strcmp( strings[ i ].ptr, strings[ i + 1 ].ptr );
-
-            if ( result > 0 ) {
-                swap( &strings[ i ], &strings[ i + 1 ] );
-            }
-        }
-
-        cnt++;
-    }
-}
-
-void swap( StrPar* str1, StrPar* str2 ) {
-    assert( str1 != NULL );
-    assert( str2 != NULL );
-
-    StrPar str_buf = *str1;
-    *str1 = *str2;
-    *str2 = str_buf;
-}
-
-size_t lines_counter( const char* text ) {
-    assert( text != NULL );
-
-    size_t cnt = 0;
-
-    while ( *text != '\0' ) {
-        if ( *text == '\n' && *( text + 1 ) != '\n' ) cnt++;
-
-        text++;
-    }
-
-    return cnt;
-}
-
-void go_to_alpha( const char** str ) {
-    while ( !isalpha( **str ) && **str != '\0' ) {
-        ( *str )++;
-    }
-}
-
-int first_comparator( const void* param1, const void* param2 ) {
-    assert( param1 != NULL );
-    assert( param2 != NULL );
-
-    const char* str1 = ( ( const StrPar* )param1 )->ptr;
-
-    const char* str2 = ( ( const StrPar* )param2 )->ptr;
-
-    assert( str1 != NULL );
-    assert( str2 != NULL );
-
-    while ( *str1 != '\0' && *str2 != '\0' && tolower( *str1 ) == tolower( *str2 ) ) {
-    // //     go_to_alpha( &str1 );
-    // //     go_to_alpha( &str2 );
-        if ( !isalpha( *str1 ) ) {
-            str1++;
-            continue;
-        }
-        if ( !isalpha( *str2 ) ) {
-            str2++;
-            continue;
-        }
-
-        str1++;
-        str2++;
-    }
-
-    assert( str1 != NULL );
-    assert( str2 != NULL );
-
-    int result = *str1 - *str2;
-
-    return result;
-}
-
-int second_comparator( const void* param1, const void* param2 ) {
-
 }
