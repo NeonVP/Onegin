@@ -9,7 +9,7 @@
 #include "../include/String.h"
 
 struct StrPar{
-    char* ptr;
+    const char* ptr;
     size_t len = 0;
 };
 
@@ -22,6 +22,9 @@ void splitting_into_lines( StrPar* string_ptrs, char* text, const size_t nLines 
 void bubble_sort( StrPar* strings, const size_t nLines );
 void swap( StrPar* str1, StrPar* str2 );
 int comparator( const void* param1, const void* param2 );
+
+void go_to_alpha( const char** str );
+int first_comparator( const void* param1, const void* param2 );
 
 
 int main() {
@@ -43,6 +46,8 @@ int main() {
 
     size_t nLines = lines_counter( text );
 
+    // nLines = 3;
+
     StrPar* strings = ( StrPar* ) calloc ( nLines, sizeof( StrPar ) );
 
     assert( strings != NULL );
@@ -50,10 +55,6 @@ int main() {
     splitting_into_lines( strings, text, nLines );
 
     bubble_sort( strings, nLines );
-
-    for ( unsigned long i = 0; i < nLines; i++ ) {
-        printf( "%s\n", strings[i].ptr );
-    }
 
     FILE* file_for_results = fopen( "./texts/result_text.txt", "w" );
 
@@ -65,6 +66,18 @@ int main() {
 
     free( text );
     free( strings );
+
+    // fprintf( stderr, "%d\n", strcmp( "aaa", "bbb" ) );
+    // fprintf( stderr, "%d\n", first_comparator( "aaa", "bbb" ) );
+
+    const char* str = "abcde   h";
+    const char* str_old = str;
+
+    go_to_alpha( &str );
+
+    fprintf( stderr, "%ld\n", str_old - str );
+
+
 
     return 0;
 }
@@ -105,7 +118,8 @@ void bubble_sort( StrPar* strings, const size_t nLines ) {
     size_t cnt = 1;
     while ( cnt < nLines ) {
         for ( size_t i = 0; i < nLines - cnt; i++ ) {
-            int result = strcmp( strings[ i ].ptr, strings[ i + 1 ].ptr );
+            int result = first_comparator( ( const void* )&strings[ i ], ( const void* )&strings[ i + 1 ] );
+            // int result = strcmp( strings[ i ].ptr, strings[ i + 1 ].ptr );
 
             if ( result > 0 ) {
                 swap( &strings[ i ], &strings[ i + 1 ] );
@@ -139,42 +153,47 @@ size_t lines_counter( const char* text ) {
     return cnt;
 }
 
-// int comparator( const void* param1, const void* param2 ) {
-//     const char const ** str1 = ( const char const ** ) param1;
-//     const char const ** str2 = ( const char const ** ) param2;
+void go_to_alpha( const char** str ) {
+    while ( !isalpha( **str ) && **str != '\0' ) {
+        ( *str )++;
+    }
+}
 
-//     int diff = 0;
+int first_comparator( const void* param1, const void* param2 ) {
+    assert( param1 != NULL );
+    assert( param2 != NULL );
 
-//     while ( **str1 != '\0' && **str2 != '\0' ) {
-//         while ( !isalpha( **str1 ) && **str1 != '\0' ) {
-//             *str1++;
-//         }
-//         while ( !isalpha( **str2 ) && **str1 != '\0' ) {
-//             *str2++;
-//         }
+    const char* str1 = ( ( const StrPar* )param1 )->ptr;
 
-//         diff = **str1 - **str2;
+    const char* str2 = ( ( const StrPar* )param2 )->ptr;
 
-//         if ( diff > 0 ) {
-//             return 1;
-//         }
-//         else if ( diff < 0 ) {
-//             return -1;
-//         }
-//         else {
-//             continue;;
-//         }
-//     }
+    assert( str1 != NULL );
+    assert( str2 != NULL );
 
-//     diff = **str1 - **str2;
+    while ( *str1 != '\0' && *str2 != '\0' && tolower( *str1 ) == tolower( *str2 ) ) {
+    // //     go_to_alpha( &str1 );
+    // //     go_to_alpha( &str2 );
+        if ( !isalpha( *str1 ) ) {
+            str1++;
+            continue;
+        }
+        if ( !isalpha( *str2 ) ) {
+            str2++;
+            continue;
+        }
 
-//     if ( diff > 0 ) {
-//         return 1;
-//     }
-//     else if ( diff < 0 ) {
-//         return -1;
-//     }
-//     else {
-//         return 0;
-//     }
-// }
+        str1++;
+        str2++;
+    }
+
+    assert( str1 != NULL );
+    assert( str2 != NULL );
+
+    int result = *str1 - *str2;
+
+    return result;
+}
+
+int second_comparator( const void* param1, const void* param2 ) {
+
+}
