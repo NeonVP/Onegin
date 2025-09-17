@@ -2,115 +2,113 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
+
+#include <sys/stat.h>
 
 #include "../include/String.h"
 
-void reading_file( FILE* file, char** text, const long nLines );
-void writing_in_file( FILE* file_for_results, char** text, const long nLines );
+struct StrPar{
+    char* ptr;
+    size_t len = 0;
+};
 
-void free_text( char** text, const long nLines );
+void writing_in_file( FILE* file_for_results, StrPar* strings, const size_t nLines );
 
-long lines_counter( FILE* file );
+size_t lines_counter( const char* text );
 
-void bubble_sort_strings( char** text, const long nLines );
-void swap( char** str1, char** str2 );
+void splitting_into_lines( StrPar* string_ptrs, char* text, const size_t nLines );
+
+void bubble_sort( StrPar* strings, const size_t nLines );
+void swap( StrPar* str1, StrPar* str2 );
+int comparator( const void* param1, const void* param2 );
 
 
 int main() {
-    FILE* file = fopen( "./texts/original_text.txt", "r" );
+    const char* file_with_original_text = "./texts/original_text.txt";
 
-    if ( file == NULL ) {
-        fprintf( stderr, "Fail - open file\n" );
-        return 1;
-    }
-    else {
-        fprintf( stderr, "Succesful - open file\n" );
-    }
+    struct stat file_stat;
+    stat( file_with_original_text, &file_stat );
+    size_t size = ( size_t ) file_stat.st_size;
 
-    long nLines = lines_counter( file );
+    char* text = ( char* ) calloc ( size + 1, sizeof( char ) );
 
-    char** text = ( char** ) calloc ( ( size_t )nLines, sizeof( char* ) );
+    FILE* file = fopen( file_with_original_text, "r" );
 
-    if ( text == NULL ) {
-        fprintf( stderr, "Fail - allocate memory for the text\n" );
-        return 1;
-    }
-    else {
-        fprintf(stderr, "Succesful - allocate memory for the text\n" );
-    }
+    assert( file != NULL );
 
-    reading_file( file, text, nLines );
+    fread( text, sizeof( char ), size, file );
 
     fclose( file );
 
+    size_t nLines = lines_counter( text );
+
+    StrPar* strings = ( StrPar* ) calloc ( nLines, sizeof( StrPar ) );
+
+    assert( strings != NULL );
+
+    splitting_into_lines( strings, text, nLines );
+
+    bubble_sort( strings, nLines );
+
+    for ( unsigned long i = 0; i < nLines; i++ ) {
+        printf( "%s\n", strings[i].ptr );
+    }
+
     FILE* file_for_results = fopen( "./texts/result_text.txt", "w" );
 
-    if ( file == NULL ) {
-        fprintf( stderr, "Fail - open file\n" );
-        return 1;
-    }
-    else {
-        fprintf( stderr, "Succesful - open file\n" );
-    }
+    assert( file_for_results != NULL );
 
-    bubble_sort_strings( text, nLines );
-
-    writing_in_file( file_for_results, text, nLines );
+    writing_in_file( file_for_results, strings, nLines );
 
     fclose( file_for_results );
-    free_text( text, nLines );
+
+    free( text );
+    free( strings );
 
     return 0;
 }
 
 
-void reading_file( FILE* file, char** text, const long nLines ) {
-    assert( file != NULL     );
-    assert( text != NULL     );
-    assert( isfinite( NULL ) );
-
-    char str[100] = "\0";
-
-    for ( long int i = 0; i < nLines; i++ ) {
-        fgets( str, 100, file );
-        *(text + i) = strdup( str );
-    }
-}
-
-void writing_in_file( FILE* file_for_results, char** text, const long nLines ) {
+void writing_in_file( FILE* file_for_results, StrPar* strings, const size_t nLines ) {
     assert( file_for_results != NULL );
-    assert( text             != NULL );
-    assert( isfinite( nLines )       );
+    assert( strings          != NULL );
+    assert( nLines > 0               );
 
-    for ( int i = 0; i < nLines; i++ ) {
-        fputs( text[i], file_for_results );
+    for ( size_t i = 0; i < nLines; i++ ) {
+        fputs( strings[i].ptr, file_for_results );
     }
 
     fprintf( stderr, "Succesful - write in file\n" );
 }
 
-void free_text( char** text, const long nLines ) {
-    assert( text != NULL       );
-    assert( isfinite( nLines ) );
+void splitting_into_lines( StrPar* strings, char* text, const size_t nLines ) {
+    for ( size_t i = 0; i < nLines; i++ ) {
+        strings[i].ptr = text;
+        fprintf( stderr, "  text ptr - %p\n", text);
+        fprintf( stderr, "string ptr - %p\n", strings[i].ptr);
 
-    for ( long int i = 0; i < nLines; i++ ) {
-        free( text[i] );
+        while ( *text != '\n' ) {
+            strings[i].len++;
+            fprintf( stderr, "len - %d\n", ( int ) strings[i].len);
+            text++;
+        }
+
+        *text++ = '\0';
     }
-
-    free( text );
 }
 
-void bubble_sort_strings( char** text, const long nLines ) {
-    assert( text != NULL       );
+void bubble_sort( StrPar* strings, const size_t nLines ) {
+    assert( strings != NULL    );
     assert( isfinite( nLines ) );
 
-    int cnt = 1;
+    size_t cnt = 1;
     while ( cnt < nLines ) {
-        for ( int i = 0; i < nLines - cnt; i++ ) {
-            int result = my_strcmp( text[ i ], text[ i + 1 ] );
+        for ( size_t i = 0; i < nLines - cnt; i++ ) {
+            int result = strcmp( strings[ i ].ptr, strings[ i + 1 ].ptr );
 
             if ( result > 0 ) {
-                swap( &text[ i ], &text[ i + 1 ] );
+                swap( &strings[ i ], &strings[ i + 1 ] );
             }
         }
 
@@ -118,26 +116,65 @@ void bubble_sort_strings( char** text, const long nLines ) {
     }
 }
 
-void swap( char** str1, char** str2 ) {
+void swap( StrPar* str1, StrPar* str2 ) {
     assert( str1 != NULL );
     assert( str2 != NULL );
 
-    char* str_buf = *str1;
+    StrPar str_buf = *str1;
     *str1 = *str2;
     *str2 = str_buf;
 }
 
-long lines_counter( FILE* file ) {
-    assert( file != NULL );
+size_t lines_counter( const char* text ) {
+    assert( text != NULL );
 
-    long cnt = 0;
-    int ch = 0;
+    size_t cnt = 0;
 
-    while ( ( ch = fgetc( file ) ) != EOF ) {
-        if ( ch == '\n' ) cnt++;
+    while ( *text != '\0' ) {
+        if ( *text == '\n' && *( text + 1 ) != '\n' ) cnt++;
+
+        text++;
     }
-
-    rewind( file );
 
     return cnt;
 }
+
+// int comparator( const void* param1, const void* param2 ) {
+//     const char const ** str1 = ( const char const ** ) param1;
+//     const char const ** str2 = ( const char const ** ) param2;
+
+//     int diff = 0;
+
+//     while ( **str1 != '\0' && **str2 != '\0' ) {
+//         while ( !isalpha( **str1 ) && **str1 != '\0' ) {
+//             *str1++;
+//         }
+//         while ( !isalpha( **str2 ) && **str1 != '\0' ) {
+//             *str2++;
+//         }
+
+//         diff = **str1 - **str2;
+
+//         if ( diff > 0 ) {
+//             return 1;
+//         }
+//         else if ( diff < 0 ) {
+//             return -1;
+//         }
+//         else {
+//             continue;;
+//         }
+//     }
+
+//     diff = **str1 - **str2;
+
+//     if ( diff > 0 ) {
+//         return 1;
+//     }
+//     else if ( diff < 0 ) {
+//         return -1;
+//     }
+//     else {
+//         return 0;
+//     }
+// }
