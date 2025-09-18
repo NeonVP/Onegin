@@ -57,6 +57,10 @@ int main() {
 
     writing_in_file( file_for_results, strings, nLines );
 
+    fputs( "\n\n", file_for_results );
+
+    fwrite( text, sizeof( char ), files.size_orig_file, file_for_results );
+
     assert( fclose( file_for_results ) == 0 );
 
     free( text );

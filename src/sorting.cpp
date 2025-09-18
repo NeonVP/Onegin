@@ -2,7 +2,8 @@
 
 void bubble_sort( StrPar* strings, const size_t nLines, int ( *comparator ) ( const void*, const void* ) ) {
     assert( strings != NULL    );
-    assert( isfinite( nLines ) );
+    assert( nLines > 0         );
+    assert( comparator != NULL );
 
     size_t cnt = 1;
     while ( cnt < nLines ) {
@@ -110,6 +111,9 @@ int second_comparator( const void* param1, const void* param2 ) {
         pointer2--;
     }
 
+    assert( pointer1 != NULL );
+    assert( pointer2 != NULL );
+
     int result = 0;
 
     if ( pointer1 + 1 == str1 && pointer2 + 1 == str2 ) {
@@ -124,9 +128,6 @@ int second_comparator( const void* param1, const void* param2 ) {
     else {
         result = tolower( *pointer1 ) - tolower( *pointer2 );
     }
-
-
-    // int result = tolower( *pointer1 ) - tolower( *pointer2 );
 
     return result;
 }

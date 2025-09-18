@@ -6,7 +6,7 @@ void writing_in_file( FILE* file_for_results, StrPar* strings, const size_t nLin
     assert( nLines > 0               );
 
     for ( size_t i = 0; i < nLines; i++ ) {
-        fputs( strings[i].ptr, file_for_results );  // fwrite
+       fwrite( strings[i].ptr, sizeof( char ), strings[i].len, file_for_results );
     }
 }
 
@@ -33,6 +33,6 @@ void splitting_into_lines( StrPar* strings, char* text, const size_t nLines ) {
             text++;
         }
 
-        *text++ = '\0';
+        text++;
     }
 }
