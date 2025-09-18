@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <assert.h>
-#include <ctype.h>
-
 #include <sys/stat.h>
 
 #include "../include/common.h"
@@ -12,14 +9,18 @@
 #include "../include/iostream.h"
 
 struct FilesStats {
-    const char* original_text = "./texts/original_text.txt";
+    const char* original_text = "\0";
     off_t size_orig_file = 0;
-    const char* result_text = "./texts/result_text.txt";
+    const char* result_text = "\0";
 };
 
 
-int main() {
-    FilesStats files;
+int main() {        //TODO: add command line arguments
+    FilesStats files = {
+        "./texts/original_text.txt",
+        0,
+        "./texts/result_text.txt"
+    };
 
     FILE* file = fopen( files.original_text, "r" );
     assert( file != NULL );
@@ -28,7 +29,9 @@ int main() {
     stat( files.original_text, &file_stat );
     files.size_orig_file = file_stat.st_size;
 
-    char* text = ( char* ) calloc ( files.size_orig_file + 1, sizeof( char ) );
+    char* text = ( char* ) calloc ( files.size_orig_file + 1, sizeof( char ) );             //TODO: rename to buffer after sem
+
+    assert( text != NULL );
 
     fread( text, sizeof( char ), files.size_orig_file, file );
 
@@ -50,14 +53,10 @@ int main() {
 
     writing_in_file( file_for_results, strings, nLines );
 
-    fputs( "\n\n", file_for_results );
-
     qsort( ( void* ) strings, nLines, sizeof( StrPar ), second_comparator );
     // bubble_sort( strings, nLines, second_comparator );
 
     writing_in_file( file_for_results, strings, nLines );
-
-    fputs( "\n\n", file_for_results );
 
     fwrite( text, sizeof( char ), files.size_orig_file, file_for_results );
 

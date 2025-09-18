@@ -8,6 +8,8 @@ void writing_in_file( FILE* file_for_results, StrPar* strings, const size_t nLin
     for ( size_t i = 0; i < nLines; i++ ) {
        fwrite( strings[i].ptr, sizeof( char ), strings[i].len, file_for_results );
     }
+
+    fputs( "\n\n", file_for_results );
 }
 
 size_t lines_counter( const char* text ) {
@@ -25,6 +27,10 @@ size_t lines_counter( const char* text ) {
 }
 
 void splitting_into_lines( StrPar* strings, char* text, const size_t nLines ) {
+    assert( strings != NULL );
+    assert( text    != NULL );
+    assert( nLines   > 0    );
+
     for ( size_t i = 0; i < nLines; i++ ) {
         strings[i].ptr = text;
 

@@ -32,23 +32,29 @@ int first_comparator( const void* param1, const void* param2 ) {
     assert( param1 != NULL );
     assert( param2 != NULL );
 
-    const char* str1 = ( ( const StrPar* ) param1 )->ptr;
-
-    const char* str2 = ( ( const StrPar* ) param2 )->ptr;
+    const char*  str1 = ( ( const StrPar* ) param1 )->ptr;
+    // const size_t len1 = ( ( const StrPar* ) param1 )->len;
+    const char*  str2 = ( ( const StrPar* ) param2 )->ptr;
+    // const size_t len2 = ( ( const StrPar* ) param2 )->len;
 
     assert( str1 != NULL );
     assert( str2 != NULL );
+    // assert( len1 > 0     );
+    // assert( len2 > 0     );
 
-    while ( !isalpha( *str1 ) && *str1 != '\0' ) {
+    // const char* end1 = str1 + len1;
+    // const char* end2 = str2 + len2;
+
+    while ( !isalpha( *str1 ) && *str1 != '\n' ) {
         str1++;
         continue;
     }
-    while ( !isalpha( *str2 ) && *str2 != '\0' ) {
+    while ( !isalpha( *str2 ) && *str2 != '\n' ) {
         str2++;
         continue;
     }
 
-    while ( *str1 != '\0' && tolower( *str1 ) == tolower( *str2 ) ) {
+    while ( *str1 != '\n' && tolower( *str1 ) == tolower( *str2 ) ) {
         if ( !isalpha( *str1 ) ) {
             str1++;
             continue;
