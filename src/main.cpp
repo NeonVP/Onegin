@@ -15,7 +15,7 @@ struct FilesStats {
 };
 
 
-int main() {        //TODO: add command line arguments
+int main() {        //TODO: add command line arguments, function that creates FilesStat, calloc buffer and other
     FilesStats files = {
         "./texts/original_text.txt",
         0,
@@ -30,17 +30,16 @@ int main() {        //TODO: add command line arguments
     files.size_orig_file = file_stat.st_size;
 
     char* text = ( char* ) calloc ( files.size_orig_file + 1, sizeof( char ) );             //TODO: rename to buffer after sem
-
     assert( text != NULL );
 
     fread( text, sizeof( char ), files.size_orig_file, file );
 
-    assert( fclose( file ) == 0 );
+    int result_of_fclose = fclose( file );
+    assert( result_of_fclose == 0 );
 
     size_t nLines = lines_counter( text );
 
     StrPar* strings = ( StrPar* ) calloc ( nLines, sizeof( StrPar ) );
-
     assert( strings != NULL );
 
     splitting_into_lines( strings, text, nLines );
@@ -48,19 +47,15 @@ int main() {        //TODO: add command line arguments
     bubble_sort( strings, nLines, ( int (*) ( const void*, const void* ) ) first_comparator );
 
     FILE* file_for_results = fopen( files.result_text, "w" );
-
     assert( file_for_results != NULL );
 
     writing_in_file( file_for_results, strings, nLines );
-
     qsort( ( void* ) strings, nLines, sizeof( StrPar ), second_comparator );
-    // bubble_sort( strings, nLines, second_comparator );
-
     writing_in_file( file_for_results, strings, nLines );
-
     fwrite( text, sizeof( char ), files.size_orig_file, file_for_results );
 
-    assert( fclose( file_for_results ) == 0 );
+    result_of_fclose = fclose( file_for_results );
+    assert( result_of_fclose == 0 );
 
     free( text );
     free( strings );
