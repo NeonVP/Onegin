@@ -1,14 +1,13 @@
 #include "../include/sorting.h"
 
-void bubble_sort( StrPar* strings, const size_t nLines ) {
+void bubble_sort( StrPar* strings, const size_t nLines, int ( *comparator ) ( const void*, const void* ) ) {
     assert( strings != NULL    );
     assert( isfinite( nLines ) );
 
     size_t cnt = 1;
     while ( cnt < nLines ) {
         for ( size_t i = 0; i < nLines - cnt; i++ ) {
-            int result = first_comparator( ( const void* )&strings[ i ], ( const void* )&strings[ i + 1 ] );
-            // int result = strcmp( strings[ i ].ptr, strings[ i + 1 ].ptr );
+            int result = comparator( ( const void* )&strings[ i ], ( const void* )&strings[ i + 1 ] );
 
             if ( result > 0 ) {
                 swap( &strings[ i ], &strings[ i + 1 ] );
@@ -39,9 +38,16 @@ int first_comparator( const void* param1, const void* param2 ) {
     assert( str1 != NULL );
     assert( str2 != NULL );
 
-    while ( *str1 != '\0' && *str2 != '\0' && tolower( *str1 ) == tolower( *str2 ) ) {
-    // //     go_to_alpha( &str1 );
-    // //     go_to_alpha( &str2 );
+    while ( !isalpha( *str1 ) && *str1 != '\0' ) {
+        str1++;
+        continue;
+    }
+    while ( !isalpha( *str2 ) && *str2 != '\0' ) {
+        str2++;
+        continue;
+    }
+
+    while ( *str1 != '\0' && tolower( *str1 ) == tolower( *str2 ) ) {
         if ( !isalpha( *str1 ) ) {
             str1++;
             continue;
@@ -58,7 +64,7 @@ int first_comparator( const void* param1, const void* param2 ) {
     assert( str1 != NULL );
     assert( str2 != NULL );
 
-    int result = *str1 - *str2;
+    int result = tolower( *str1 ) - tolower( *str2 );
 
     return result;
 }
@@ -77,29 +83,50 @@ int second_comparator( const void* param1, const void* param2 ) {
     assert( len1 > 0     );
     assert( len2 > 0     );
 
-    const char* index1 = str1 + len1;
-    const char* index2 = str2 + len2;
+    const char* pointer1 = str1 + len1;
+    const char* pointer2 = str2 + len2;
 
-    while ( index1 > str1 && index2 > str2 && tolower( *str1 ) == tolower( *str2 ) ) {
-        if ( !isalpha( *index1 ) ) {
-            index1--;
+    while ( !isalpha( *pointer1 ) && pointer1 > str1 ) {
+        pointer1--;
+        continue;
+    }
+    while ( !isalpha( *pointer2 ) && pointer2 > str2 ) {
+        pointer2--;
+        continue;
+    }
+
+    while ( pointer1 > str1 && pointer2 > str2 && tolower( *pointer1 ) == tolower( *pointer2 ) ) {
+        if ( !isalpha( *pointer1 ) ) {
+            pointer1--;
             continue;
         }
 
-        if ( !isalpha( *index2 ) ) {
-            index2--;
+        if ( !isalpha( *pointer2 ) ) {
+            pointer2--;
             continue;
         }
 
-        index1--;
-        index2--;
+        pointer1--;
+        pointer2--;
+    }
+
+    int result = 0;
+
+    if ( pointer1 + 1 == str1 && pointer2 + 1 == str2 ) {
+        result = 0;
+    }
+    else if ( pointer1 + 1  == str1 ) {
+        result = 0 - tolower( *pointer2 );
+    }
+    else if ( pointer2 + 1 == str2 ) {
+        result = tolower( *pointer1 ) - 0;
+    }
+    else {
+        result = tolower( *pointer1 ) - tolower( *pointer2 );
     }
 
 
-    assert( str1 != NULL );
-    assert( str2 != NULL );
-
-    int result = *index1 - *index2;
+    // int result = tolower( *pointer1 ) - tolower( *pointer2 );
 
     return result;
 }

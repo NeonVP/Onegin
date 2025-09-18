@@ -11,32 +11,28 @@
 #include "../include/sorting.h"
 #include "../include/iostream.h"
 
-struct Files {
-    const char* original_text;
-    const char* result_text;
+struct FilesStats {
+    const char* original_text = "./texts/original_text.txt";
+    off_t size_orig_file = 0;
+    const char* result_text = "./texts/result_text.txt";
 };
 
 
 int main() {
-    Files files =
-    {
-        "./texts/original_text.txt",
-        "./texts/result_text.txt"
-    };
+    FilesStats files;
 
     FILE* file = fopen( files.original_text, "r" );
+    assert( file != NULL );
 
     struct stat file_stat;
     stat( files.original_text, &file_stat );
-    off_t size = file_stat.st_size;
+    files.size_orig_file = file_stat.st_size;
 
-    char* text = ( char* ) calloc ( size + 1, sizeof( char ) );
+    char* text = ( char* ) calloc ( files.size_orig_file + 1, sizeof( char ) );
 
-    assert( file != NULL );
+    fread( text, sizeof( char ), files.size_orig_file, file );
 
-    fread( text, sizeof( char ), size, file );
-
-    fclose( file );
+    assert( fclose( file ) == 0 );
 
     size_t nLines = lines_counter( text );
 
@@ -46,7 +42,7 @@ int main() {
 
     splitting_into_lines( strings, text, nLines );
 
-    bubble_sort( strings, nLines );
+    bubble_sort( strings, nLines, ( int (*) ( const void*, const void* ) ) first_comparator );
 
     FILE* file_for_results = fopen( files.result_text, "w" );
 
@@ -54,11 +50,14 @@ int main() {
 
     writing_in_file( file_for_results, strings, nLines );
 
-    // qsort( ( void* ) strings, nLines, sizeof( StrPar ), second_comparator );
+    fputs( "\n\n", file_for_results );
 
-    // writing_in_file( file_for_results, strings, nLines );
+    qsort( ( void* ) strings, nLines, sizeof( StrPar ), second_comparator );
+    // bubble_sort( strings, nLines, second_comparator );
 
-    fclose( file_for_results );
+    writing_in_file( file_for_results, strings, nLines );
+
+    assert( fclose( file_for_results ) == 0 );
 
     free( text );
     free( strings );

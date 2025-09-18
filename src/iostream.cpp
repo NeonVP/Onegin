@@ -6,7 +6,7 @@ void writing_in_file( FILE* file_for_results, StrPar* strings, const size_t nLin
     assert( nLines > 0               );
 
     for ( size_t i = 0; i < nLines; i++ ) {
-        fputs( strings[i].ptr, file_for_results );
+        fputs( strings[i].ptr, file_for_results );  // fwrite
     }
 }
 
