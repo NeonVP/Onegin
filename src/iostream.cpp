@@ -42,3 +42,11 @@ void splitting_into_lines( StrPar* strings, char* text, const size_t nLines ) {
         text++;
     }
 }
+
+off_t determining_the_file_size( const char * file_name ) {
+    struct stat file_stat;
+    int check_stat = stat( file_name, &file_stat );
+    assert( check_stat );
+
+    return file_stat.st_size;
+}

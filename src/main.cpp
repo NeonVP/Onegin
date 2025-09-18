@@ -4,7 +4,6 @@
 #include <sys/stat.h>
 
 #include "../include/common.h"
-#include "../include/String.h"
 #include "../include/sorting.h"
 #include "../include/iostream.h"
 
@@ -15,7 +14,7 @@ struct FilesStats {
 };
 
 
-int main() {        //TODO: add command line arguments, function that creates FilesStat, calloc buffer and other
+int main() {        //TODO: add command line arguments, function that creates FilesStat, calloc buffer and other, (optional) my qsort
     FilesStats files = {
         "./texts/original_text.txt",
         0,
@@ -25,9 +24,8 @@ int main() {        //TODO: add command line arguments, function that creates Fi
     FILE* file = fopen( files.original_text, "r" );
     assert( file != NULL );
 
-    struct stat file_stat;
-    stat( files.original_text, &file_stat );
-    files.size_orig_file = file_stat.st_size;
+    // TODO: funtion for determining the file size
+    files.size_orig_file = determining_the_file_size( files.original_text );
 
     char* text = ( char* ) calloc ( files.size_orig_file + 1, sizeof( char ) );             //TODO: rename to buffer after sem
     assert( text != NULL );
@@ -44,11 +42,10 @@ int main() {        //TODO: add command line arguments, function that creates Fi
 
     splitting_into_lines( strings, text, nLines );
 
-    bubble_sort( strings, nLines, ( int (*) ( const void*, const void* ) ) first_comparator );
-
     FILE* file_for_results = fopen( files.result_text, "w" );
     assert( file_for_results != NULL );
 
+    bubble_sort( strings, nLines, ( int (*) ( const void*, const void* ) ) first_comparator );
     writing_in_file( file_for_results, strings, nLines );
     qsort( ( void* ) strings, nLines, sizeof( StrPar ), second_comparator );
     writing_in_file( file_for_results, strings, nLines );
@@ -62,3 +59,6 @@ int main() {        //TODO: add command line arguments, function that creates Fi
 
     return 0;
 }
+
+
+/* nightmare in TXlib.h for goto */

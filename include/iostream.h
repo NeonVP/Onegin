@@ -3,9 +3,11 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <sys/stat.h>
 
 #include "../include/common.h"
 
+off_t determining_the_file_size( const char * file_name );
 
 void writing_in_file( FILE* file_for_results, StrPar* strings, const size_t nLines );
 
