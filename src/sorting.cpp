@@ -1,4 +1,4 @@
-#include "../include/sorting.h"
+#include "sorting.h"
 
 void bubble_sort( StrPar* strings, const size_t nLines, int ( *comparator ) ( const void*, const void* ) ) {
     assert( strings != NULL    );
@@ -45,6 +45,7 @@ int first_comparator( const void* param1, const void* param2 ) {
     // const char* end1 = str1 + len1;
     // const char* end2 = str2 + len2;
 
+    // TODO: create new function for going to alpha
     while ( !isalpha( *str1 ) && *str1 != '\n' ) {
         str1++;
         continue;
@@ -54,7 +55,7 @@ int first_comparator( const void* param1, const void* param2 ) {
         continue;
     }
 
-    while ( *str1 != '\n' && tolower( *str1 ) == tolower( *str2 ) ) {
+    while ( *str1 != '\n' && *str2 != '\n' && tolower( *str1 ) == tolower( *str2 ) ) {
         if ( !isalpha( *str1 ) ) {
             str1++;
             continue;
@@ -68,8 +69,14 @@ int first_comparator( const void* param1, const void* param2 ) {
         str2++;
     }
 
-    assert( str1 != NULL );
-    assert( str2 != NULL );
+    while ( !isalpha( *str1 ) && *str1 != '\n' ) {
+        str1++;
+        continue;
+    }
+    while ( !isalpha( *str2 ) && *str2 != '\n' ) {
+        str2++;
+        continue;
+    }
 
     int result = tolower( *str1 ) - tolower( *str2 );
 

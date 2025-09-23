@@ -1,4 +1,15 @@
-#include "../include/iostream.h"
+#include "io.h"
+
+
+void reading_orig_file( FileStat orig_file, char* buffer ) {
+    FILE* file = fopen( orig_file.address, "r" );
+
+    size_t result_of_read = fread( buffer, sizeof( char ), ( size_t )orig_file.size, file );
+    assert( result_of_read   != 0 );
+
+    int result_of_fclose = fclose( file );
+    assert( result_of_fclose == 0 );
+}
 
 void writing_in_file( FILE* file_for_results, StrPar* strings, const size_t nLines ) {
     assert( file_for_results != NULL );
@@ -10,6 +21,8 @@ void writing_in_file( FILE* file_for_results, StrPar* strings, const size_t nLin
     }
 
     fputs( "\n\n", file_for_results );
+
+    fprintf( stderr, "Write Onegin in file\n" );
 }
 
 size_t lines_counter( const char* text ) {
@@ -41,12 +54,23 @@ void splitting_into_lines( StrPar* strings, char* text, const size_t nLines ) {
 
         text++;
     }
+
+    fprintf( stderr, "Find pointers of string begin\n" );
 }
 
 off_t determining_the_file_size( const char * file_name ) {
     struct stat file_stat;
     int check_stat = stat( file_name, &file_stat );
-    assert( check_stat );
+    assert( check_stat == 0 );
 
     return file_stat.st_size;
+}
+
+void print_help( const char* program_name ) {
+    fprintf( stderr, "Usage: %s [OPTIONS] [FILE...]\n"
+                     "Options:\n"
+                     "  -h, --help          Display this help message\n"
+                     "  -i, --input FILE    Set input file  ( default: ./texts/original_text.txt )\n"
+                     "  -o, --output FILE   Set output file ( default: ./texts/result_text.txt )\n",
+             program_name );
 }
