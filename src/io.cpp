@@ -3,6 +3,7 @@
 
 void reading_orig_file( FileStat orig_file, char* buffer ) {
     FILE* file = fopen( orig_file.address, "r" );
+    assert( file != NULL );
 
     size_t result_of_read = fread( buffer, sizeof( char ), ( size_t )orig_file.size, file );
     assert( result_of_read   != 0 );
