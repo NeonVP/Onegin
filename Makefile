@@ -6,7 +6,7 @@ CPPFLAGS_DEBUG := -D _DEBUG -I./include -ggdb3 -std=c++17 -O0 -Wall -Wextra -Wef
 
 LDFLAGS =
 # SOURCES = $( wildcard ./src/*.cpp )
-SOURCES = src/io.cpp src/sorting.cpp src/main.cpp
+SOURCES = src/main.cpp src/io.cpp src/sorting.cpp src/text_processing.cpp
 OBJECTS = $(SOURCES:src/%.cpp=obj/%.o)
 TARGET       := onegin
 DEBUG_TARGET := debug

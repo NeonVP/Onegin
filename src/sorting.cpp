@@ -28,7 +28,7 @@ void swap( StrPar* str1, StrPar* str2 ) {
     *str2 = str_buf;
 }
 
-int first_comparator( const void* param1, const void* param2 ) {
+int comparator( const void* param1, const void* param2 ) {
     assert( param1 != NULL );
     assert( param2 != NULL );
 
@@ -83,7 +83,7 @@ int first_comparator( const void* param1, const void* param2 ) {
     return result;
 }
 
-int second_comparator( const void* param1, const void* param2 ) {
+int reverse_comparator( const void* param1, const void* param2 ) {
     assert( param1 != NULL );
     assert( param2 != NULL );
 

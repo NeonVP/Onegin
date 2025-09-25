@@ -6,18 +6,20 @@
 #include <sys/stat.h>
 
 #include "common.h"
-#include "sorting.h"
 #include "io.h"
+#include "text_processing.h"
 
 int init( int argc, char* argv[], FileStat* orig_file, FileStat* res_file, char** buffer );
 
 
-int main( int argc, char* argv[]) {        // TODO: add command line arguments, function that creates FilesStat, calloc buffer and other
+int main( int argc, char* argv[]) {
     FileStat original_file = { "./texts/original_text.txt" };
     FileStat result_file   = { "./texts/result_text.txt"   };
     char* buffer = NULL;
 
     init( argc, argv, &original_file, &result_file, &buffer );
+
+    reading_orig_file( original_file, buffer );
 
     original_file.nLines = lines_counter( buffer );
     StrPar* strings = ( StrPar* ) calloc ( original_file.nLines, sizeof( StrPar ) );
@@ -25,20 +27,7 @@ int main( int argc, char* argv[]) {        // TODO: add command line arguments, 
 
     splitting_into_lines( strings, buffer, original_file.nLines );
 
-    FILE* file_for_results = fopen( result_file.address, "w" );
-    assert( file_for_results != NULL );
-
-    bubble_sort( strings, original_file.nLines, first_comparator );
-    writing_in_file( file_for_results, strings, original_file.nLines );
-    qsort( ( void* ) strings, original_file.nLines, sizeof( StrPar ), second_comparator );
-    writing_in_file( file_for_results, strings, original_file.nLines );
-
-    /* Output Original Text*/
-    fwrite( buffer, sizeof( char ), ( size_t )original_file.size, file_for_results );
-    fprintf( stderr, "Write original Onegin\n" );
-
-    int result_of_fclose = fclose( file_for_results );
-    assert( result_of_fclose == 0 );
+    two_sorts_and_output_texts( buffer, strings, original_file, result_file );
 
     free( buffer  );
     free( strings );
@@ -73,19 +62,10 @@ int init( int argc, char* argv[], FileStat* orig_file, FileStat* res_file, char*
         }
     }
 
-    // if ( orig_file->address == "" ) {
-    //     orig_file->address = "./texts/original_text.txt";
-    // }
-    // if ( res_file->address == "" ) {
-    //     res_file->address  = "./texts/result.text";
-    // }
-
     orig_file->size = determining_the_file_size( orig_file->address );
 
     *buffer = ( char* ) calloc ( (size_t) orig_file->size + 1, sizeof( char ) );
     assert( *buffer != NULL );
-
-    reading_orig_file( *orig_file, *buffer );
 
     return 0;
 }

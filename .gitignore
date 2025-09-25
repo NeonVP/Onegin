@@ -1,3 +1,4 @@
 onegin
 /.vscode
 build.sh
+/obj
